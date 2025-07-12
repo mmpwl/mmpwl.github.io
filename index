@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Love Puzzle</title>
+  <style>
+   body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      background-color: #111;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+    }
+    .active {
+      display: flex;
+    }
+    .heart {
+      font-size: 80px;
+      color: red;
+      cursor: pointer;
+      animation: heartbeat 1s infinite;
+    }
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+    .code-input {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 60px);
+      gap: 10px;
+    }
+    .keypad button {
+      width: 60px;
+      height: 60px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      background-color: pink;
+    }
+    .puzzle-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+    .puzzle-container {
+      display: grid;
+      grid-template-columns: repeat(4, 100px);
+      gap: 5px;
+      margin-top: 20px;
+    }
+    .piece {
+      width: 100px;
+      height: 100px;
+      background-size: 400px 400px;
+      border: 1px solid #fff;
+      cursor: grab;
+    }
+   .slot {
+      width: 100px;
+      height: 100px;
+      border: 2px dashed white;
+    }
+    .popup {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.8);
+      background: rgba(255,192,203,0.95);
+      color: #d6336c;
+      padding: 30px 40px;
+      border-radius: 15px;
+      display: none;
+      font-size: 24px;
+      text-align: center;
+      z-index: 10;
+      opacity: 0;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .popup.show {
+      display: block;
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    .popup button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #ff69b4;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    #qrPage img {
+      max-width: 50vw;
+      max-height: 50vh;
+    }
+ 
+  </style>
+</head>
+<body>
+    
+  <div id="start" class="screen active">
+    <div class="heart" onclick="showCodeScreen()">❤️</div>
+    <p>จิ้มเบาๆนะ เดี๋ยวเจ็บ :P</p>
+  </div>
+
+  <div id="code" class="screen">
+    <h2>💖 Enter our secret code 💖</h2>
+    <div class="code-input" id="codeInput"></div>
+    <div class="keypad">
+      <button onclick="enterDigit('1')">1</button>
+      <button onclick="enterDigit('2')">2</button>
+      <button onclick="enterDigit('3')">3</button>
+      <button onclick="enterDigit('4')">4</button>
+      <button onclick="enterDigit('5')">5</button>
+      <button onclick="enterDigit('6')">6</button>
+      <button onclick="enterDigit('7')">7</button>
+      <button onclick="enterDigit('8')">8</button>
+      <button onclick="enterDigit('9')">9</button>
+      <button onclick="clearCode()">Clear</button>
+      <button onclick="enterDigit('0')">0</button>
+      <button onclick="deleteDigit()">Delete</button>
+    </div>
+  </div>
+
+  <div id="puzzle" class="screen puzzle-area">
+    <div class="puzzle-container" id="slots"></div>
+    <div class="puzzle-container" id="pieces"></div>
+  </div>
+
+  <div class="popup" id="popup">
+     สาหวัดดีวันครบรอบ วันนี้เป็นวันสำคัญของเราทั้งคู่เลยแต่เสียใจอะที่ไม่ได้อยู่ด้วยกัน
+    แต่ไม่เป็นไรเดือนหน้าเอาใหม่น้าที่รัก 
+    หนูอยากจะขอบคุณอะไรก็ตามที่ทำให้พี่อยู่กับหนูตอนนี้ ขอบคุณอะไรก็ตามที่ทำให้พี่อยู่ข้างๆหนู
+    ขอบคุณพี่ด้วยที่ยังอยู่ตรงนี้ ถึงหนูจะไม่ได้เป็นเด็็กที่ดี ไม่ได้น่ารัก แถมจะยังเป็นคนสร้างบาดแผลให้พี่อีก
+    แต่หนูจะตั้งใจและจะพยายามทำทุกวันให้มันดีนะ ให้มันดีมากๆ จะไม่ทำให้พี่เหนื่อยกับหนู จะไม่ทำตัวเป็นภาระของพี่
+    มุกอยากมีพี่อยู่ในชีวิตไปเรื่อยๆ แต่มุกก็รู้ว่าพี่ก็เหนื่อย ก็อดทน กับทุกๆวันของเราเหมือนกัน
+    ยังไงหนูก็ขอให้ทุกวันของเรามีความสุขไปพร้อมกัน มีทุกอย่างไปพร้อมๆกัน มีสมาชิกในครอบครัวไปด้วยกัน ❤️<br>มุกรักพี่มากๆน้าา<br>
+
+    <button onclick="closePopup()">ปิด</button>
+  </div>
+
+ 
+  
+  <audio id="bgMusic" src="/mnt/data/love-song.mp3" loop></audio>
+  <audio id="popupSound" src="/mnt/data/popup-sound.mp3"></audio>
+
+  <script>
+    const password = ['1','1','0','4'];
+    let input = [];
+    const codeInput = document.getElementById('codeInput');
+    let musicStarted = false;
+
+    function showCodeScreen() {
+      document.getElementById('start').classList.remove('active');
+      document.getElementById('code').classList.add('active');
+      updateInputDisplay();
+    }
+
+    function enterDigit(digit) {
+      if (input.length < 4) {
+        input.push(digit);
+        updateInputDisplay();
+        if (input.length === 4) checkCode();
+      }
+    }
+
+    function deleteDigit() {
+      input.pop();
+      updateInputDisplay();
+    }
+
+    function clearCode() {
+      input = [];
+      updateInputDisplay();
+    }
+
+    function updateInputDisplay() {
+      codeInput.innerHTML = '';
+      for (let i = 0; i < 4; i++) {
+        const span = document.createElement('span');
+        span.textContent = input[i] || '_';
+        codeInput.appendChild(span);
+      }
+    }
+
+    function checkCode() {
+      if (input.join('') === password.join('')) {
+        document.getElementById('code').classList.remove('active');
+        document.getElementById('puzzle').classList.add('active');
+        initPuzzle();
+      } else {
+        alert('Wrong code!');
+        clearCode();
+      }
+    }
+
+    const slots = document.getElementById('slots');
+    const pieces = document.getElementById('pieces');
+
+    function initPuzzle() {
+      slots.innerHTML = '';
+      pieces.innerHTML = '';
+      for (let i = 0; i < 16; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'slot';
+        slot.dataset.index = i;
+        slot.ondrop = drop;
+        slot.ondragover = allowDrop;
+        slots.appendChild(slot);
+      }
+
+      let indices = [...Array(16).keys()];
+      indices.sort(() => Math.random() - 0.5);
+
+      indices.forEach(i => {
+        const piece = document.createElement('div');
+        piece.className = 'piece';
+        piece.style.backgroundImage = "url('S__9314308_0.jpg')";
+        piece.style.backgroundPosition = `-${(i%4)*100}px -${Math.floor(i/4)*100}px`;
+        piece.setAttribute('draggable', true);
+        piece.dataset.correct = i;
+        piece.dataset.current = -1;
+        piece.ondragstart = drag;
+        piece.addEventListener('click', () => {
+          if (!musicStarted) {
+            document.getElementById('bgMusic').play();
+            musicStarted = true;
+          }
+        });
+        pieces.appendChild(piece);
+      });
+    }
+
+    function allowDrop(e) {
+      e.preventDefault();
+    }
+
+    function drag(e) {
+      e.dataTransfer.setData("text", e.target.dataset.correct);
+    }
+
+    function drop(e) {
+      e.preventDefault();
+      const correct = e.dataTransfer.getData("text");
+      const dragged = [...document.querySelectorAll('.piece')].find(p => p.dataset.correct === correct);
+      if (e.target.classList.contains('slot')) {
+        if (e.target.firstChild) {
+          pieces.appendChild(e.target.firstChild);
+        }
+        e.target.appendChild(dragged);
+      }
+      checkPuzzle();
+    }
+
+    function checkPuzzle() {
+      const allCorrect = [...slots.children].every((slot, i) => {
+        return slot.firstChild && parseInt(slot.firstChild.dataset.correct) === i;
+      });
+      if (allCorrect) {
+        const popup = document.getElementById('popup');
+        popup.classList.add('show');
+        document.getElementById('popupSound').play();
+        if (!musicStarted) {
+          document.getElementById('bgMusic').play();
+          musicStarted = true;
+        }
+      }
+    }
+function closePopup() {
+    const popup = document.getElementById('popup');
+    popup.classList.remove('show');
+    setTimeout(() => {
+      popup.style.display = 'none';
+    }, 400);
+  }
+
+  </script>
+</body>
+</html>
